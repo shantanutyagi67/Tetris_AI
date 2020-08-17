@@ -3,6 +3,8 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -30,6 +32,7 @@ public class GUI extends JFrame{
 	int endState[][] = new int [20][10];
 	int score = 0;
 	boolean prev = false;
+	Vector<Integer> Tminoes = new Vector<Integer>();
 	
 	public GUI() {
 		this.setTitle("TETRIS");
@@ -37,7 +40,7 @@ public class GUI extends JFrame{
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setVisible(true);
 		this.setResizable(false);
-		this.setBackground(Color.BLACK);
+		this.setBackground(new Color(47,61,75));
 		
 		Board board = new Board();
 		this.setContentPane(board);
@@ -49,7 +52,8 @@ public class GUI extends JFrame{
 		for(int i=0;i<20;i++)
 			for(int j=0;j<10;j++)
 				endState[i][j]= -1;
-		
+		for(int i=0;i<70;i++)
+			Tminoes.add(i%7);
 	}
 	
 	public class Board extends JPanel{
@@ -74,25 +78,26 @@ public class GUI extends JFrame{
 			//asset.rotate(2);
 			
 			//SCORE BOARD
-			g2D.setColor(Color.RED);
-			g2D.setFont(new Font("Monospaced", Font.BOLD, 50));
-			if(score==0)
-				g2D.drawString("00000"+ Integer.toString(score),690,35);
-			else if(score<10)
-				g2D.drawString("0000"+ Integer.toString(score),690,35);
+			g2D.setColor(new Color(6,24,33));
+			g2D.setFont(new Font("Monospaced", Font.BOLD, 40));
+			g2D.drawString("SCORE:",575,30);
+			if(score<10)
+				g2D.drawString("00000"+ Integer.toString(score),720,30);
 			else if(score<100)
-				g2D.drawString("000"+ Integer.toString(score),690,35);
+				g2D.drawString("0000"+ Integer.toString(score),720,30);
 			else if(score<1000)
-				g2D.drawString("00"+ Integer.toString(score),690,35);
+				g2D.drawString("000"+ Integer.toString(score),720,30);
 			else if(score<10000)
-				g2D.drawString("0"+ Integer.toString(score),690,35);
+				g2D.drawString("00"+ Integer.toString(score),720,30);
+			else if(score<100000)
+				g2D.drawString("0"+ Integer.toString(score),720,30);
 			else
-				g2D.drawString(Integer.toString(score),690,35);
+				g2D.drawString(Integer.toString(score),720,30);
 			
 			// background
 			for(int i=1;i<=20;i++) {
 				for(int j=6;j<=15;j++) {
-					g2D.setColor(Color.WHITE);
+					g2D.setColor(new Color(6,24,33));
 					g2D.fill(new Rectangle2D.Double(spacing+j*size, spacing+i*size, size-2*spacing, size-2*spacing));
 				}
 			}
@@ -116,6 +121,15 @@ public class GUI extends JFrame{
 					
 				}
 			}
+			
+			// color pallette
+			Toolkit t=Toolkit.getDefaultToolkit();  
+	        Image im=t.getImage("images/color_pallette3.jpeg");
+	        g2D.drawImage(im, 800,558,this);
+	        g2D.setColor(new Color(6,24,33));
+			g2D.setFont(new Font("Monospaced", Font.PLAIN, 15));
+			g2D.drawString("Pallette",785,850);
+			
 			checkRow();
 			if(!validDownMove()) {
 				for(int i=0;i<n;i++)
@@ -133,6 +147,7 @@ public class GUI extends JFrame{
 				cnt=0;
 				y++;
 			}
+			
 		}
 	}
 	
@@ -202,25 +217,25 @@ public class GUI extends JFrame{
 		public Color blockColor(int ran) {
 			switch(ran) {
 			case 0: {
-				return (Color.CYAN);
+				return (new Color(212, 111, 125));
 			}
 			case 1: {
-				return (Color.YELLOW);
+				return (new Color(216, 105, 84));
 			}
 			case 2: {
-				return (new Color(255, 94, 19));
+				return (new Color(209, 164, 81));
 			}
 			case 3: {
-				return (Color.BLUE);
+				return (new Color(153, 197, 89));
 			}
 			case 4: {
-				return (Color.GREEN);
+				return (new Color(95, 214, 109));
 			}
 			case 5: {
-				return (Color.RED);
+				return (new Color(92, 191, 164));
 			}
 			case 6: {
-				return (new Color(138, 43, 226));
+				return (new Color(98, 124, 189));
 			}
 		}
 			return null;
