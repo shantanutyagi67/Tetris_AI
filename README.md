@@ -1,7 +1,9 @@
 # Tetris_AI
 
 The classic TETRIS is back with great color schemes.
- Instructions:
+ 
+ # Instructions:
+ 
  Arrow Keys
  UP: rotate
  LEFT: move left
