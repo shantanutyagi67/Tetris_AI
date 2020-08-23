@@ -15,6 +15,7 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 import java.util.Vector;
 
@@ -25,13 +26,14 @@ public class GUI extends JFrame{
 	private static final long serialVersionUID = 1L;
 	
 	tetrominoes asset = new tetrominoes();
-	int size = 40, spacing = 1, speed = 300;
-	int ran = new Random().nextInt(7);
-	int n = ran==0||ran==1 ? 4 : 3;
-	int x=3, y=-2, cnt = 0;
+	int size = 40, spacing = 1, speed = 400;
+	int ran;
+	int n;
+	int x,y, cnt = 0, tmpY;
 	int endState[][] = new int [20][10];
 	int score = 0;
-	boolean prev = false;
+	boolean prev = false, hold = true;
+	int T = 0, swap = -1;
 	Vector<Integer> Tminoes = new Vector<Integer>();
 	
 	public GUI() {
@@ -39,21 +41,27 @@ public class GUI extends JFrame{
 		this.setSize(880+6,880+29); 
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setVisible(true);
-		this.setResizable(false);
+		//this.setResizable(false);
 		this.setBackground(new Color(47,61,75));
 		
 		Board board = new Board();
 		this.setContentPane(board);
 		Move move = new Move();
-		//this.addKeyListener(move);
+		this.addMouseListener(move);
 		this.addKeyListener(move);
 		this.setFocusable(true);
 		
 		for(int i=0;i<20;i++)
 			for(int j=0;j<10;j++)
 				endState[i][j]= -1;
-		for(int i=0;i<70;i++)
+		for(int i=0;i<7;i++)
 			Tminoes.add(i%7);
+		Collections.shuffle(Tminoes);
+		
+		ran = Tminoes.get(T);
+		n = ran==0||ran==1 ? 4 : 3;
+		x=3;
+		y=-n+3;
 	}
 	
 	public class Board extends JPanel{
@@ -102,11 +110,46 @@ public class GUI extends JFrame{
 				}
 			}
 			
+			//held piece
+//			if(swap!=-1) {
+//				for(int i=0;i<n;i++) {
+//					for(int j=0;j<n;j++) {
+//						g2D.setColor(blockColor(swap));
+//						if(asset.peices[swap][i][j]==1)
+//							g2D.fill(new Rectangle2D.Double(spacing+(j+1)*size, spacing+(i+1)*size, size-2*spacing, size-2*spacing));
+//					}
+//				}
+//			}
+			
+			// fall position of moving piece
+			// edit: border highlight
+			tmpY = y;
+			while(validDownMove()) y++;
+			y--;
+			for(int i=0;i<n;i++) {
+				for(int j=0;j<n;j++) {
+					g2D.setColor(new Color(255,255,255,120));
+					if(asset.peices[ran][i][j]==1 && x+j+6<16 && x+j+6>=6 && y+i+1<=20 && y+i+1>=1)
+						g2D.fill(new Rectangle2D.Double(spacing+(x+j+6)*size, spacing+(y+i+1)*size, size-2*spacing, size-2*spacing));
+					
+				}
+			}
+			for(int i=0;i<n;i++) {
+				for(int j=0;j<n;j++) {
+					g2D.setColor(blockColor(ran,120));
+//					g2D.setColor(Color.LIGHT_GRAY);
+					if(asset.peices[ran][i][j]==1 && x+j+6<16 && x+j+6>=6 && y+i+1<=20 && y+i+1>=1)
+						g2D.fill(new Rectangle2D.Double(spacing+(x+j+6)*size, spacing+(y+i+1)*size, size-2*spacing, size-2*spacing));
+					
+				}
+			}
+			y=tmpY;
+			
 			// fixed pieces
 			for(int i=0;i<20;i++) {
 				for(int j=0;j<10;j++) {
 					if(endState[i][j] != -1) {
-						g2D.setColor(blockColor(endState[i][j]));
+						g2D.setColor(blockColor(endState[i][j],255));
 						g2D.fill(new Rectangle2D.Double(spacing+(j+6)*size, spacing+(i+1)*size, size-2*spacing, size-2*spacing));
 					}
 				}
@@ -115,7 +158,7 @@ public class GUI extends JFrame{
 			// moving pieces
 			for(int i=0;i<n;i++) {
 				for(int j=0;j<n;j++) {
-					g2D.setColor(blockColor(ran));
+					g2D.setColor(blockColor(ran,255));
 					if(asset.peices[ran][i][j]==1 && x+j+6<16 && x+j+6>=6 && y+i+1<=20 && y+i+1>=1)
 						g2D.fill(new Rectangle2D.Double(spacing+(x+j+6)*size, spacing+(y+i+1)*size, size-2*spacing, size-2*spacing));
 					
@@ -138,9 +181,16 @@ public class GUI extends JFrame{
 							endState[i+y-1][j+x] = ran;
 				cnt=0;
 				x=3;
-				y=-2;
-				ran = new Random().nextInt(7);
+				y=-n+3;
+				T++;
+				if(T>=7) {
+					T %= 7;
+					Collections.shuffle(Tminoes);
+				}
+				ran = Tminoes.get(T%7);
 				n = ran==0||ran==1 ? 4 : 3;
+				speed = 400;
+				hold = true;
 			}
 			cnt++;
 			if(cnt%speed==0&& validDownMove()) {
@@ -151,16 +201,15 @@ public class GUI extends JFrame{
 		}
 	}
 	
-		public class Move implements KeyListener{
+		public class Move implements KeyListener, MouseListener{
 
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode()==KeyEvent.VK_UP && validRotation())
 						asset.rotate(ran);
 				if (e.getKeyCode()==KeyEvent.VK_DOWN){
-//					ran = new Random().nextInt(7);
-//					n = ran==0||ran==1 ? 4 : 3;
 					speed=30;
+					score++;
 				}
 				if (e.getKeyCode()==KeyEvent.VK_LEFT && validLeftMove()) {
 					x--;
@@ -175,12 +224,55 @@ public class GUI extends JFrame{
 
 			@Override
 			public void keyReleased(KeyEvent e) {
-				speed = 300;
+				speed = 400;
 			}
 
 			@Override
 			public void keyTyped(KeyEvent e) {
-				
+			}
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if(e.getButton() == MouseEvent.BUTTON3) {
+					if(swap==-1&&hold) { //cold start no swap just hold
+						swap = ran;
+						T++;
+						if(T>=7) {
+							T %= 7;
+							Collections.shuffle(Tminoes);
+						}
+						ran = Tminoes.get(T%7);
+						n = ran==0||ran==1 ? 4 : 3;
+						x = 3;
+						y = -n+3;
+					}
+					else if(hold){ // swap and hold
+						int temp = swap;
+						swap = ran;
+						ran = temp;
+						n = ran==0||ran==1 ? 4 : 3;
+						x = 3;
+						y = -n+3;
+						hold = false;
+					}
+					
+				}
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
 			}
 		}
 		boolean validRotation() {
@@ -214,28 +306,28 @@ public class GUI extends JFrame{
 			asset.rotate(ran);
 			return true;
 		}
-		public Color blockColor(int ran) {
+		public Color blockColor(int ran, int t) {
 			switch(ran) {
 			case 0: {
-				return (new Color(212, 111, 125));
+				return (new Color(212, 111, 125, t));
 			}
 			case 1: {
-				return (new Color(216, 105, 84));
+				return (new Color(216, 105, 84, t));
 			}
 			case 2: {
-				return (new Color(209, 164, 81));
+				return (new Color(209, 164, 81, t));
 			}
 			case 3: {
-				return (new Color(153, 197, 89));
+				return (new Color(153, 197, 89, t));
 			}
 			case 4: {
-				return (new Color(95, 214, 109));
+				return (new Color(95, 214, 109, t));
 			}
 			case 5: {
-				return (new Color(92, 191, 164));
+				return (new Color(92, 191, 164, t));
 			}
 			case 6: {
-				return (new Color(98, 124, 189));
+				return (new Color(98, 124, 189, t));
 			}
 		}
 			return null;
@@ -269,10 +361,13 @@ public class GUI extends JFrame{
 		
 		void checkRow() {
 			int s = 0;
-			for(int i=19;i>=0;i--) {
+			for(int i=0;i<20;i++) {
 				int count = 0;
 				for(int j=0;j<10;j++) {
-					if(endState[i][j]!=-1) count++; 
+					if(endState[i][j]!=-1) {
+						count++; 
+						
+					}
 				}
 				if(count==10) {
 					s++;

@@ -2,24 +2,24 @@
 
 public class tetrominoes {
 	public int[][][] peices = {
-		{	//I cyan
+		{	//I pink
 			{0,0,0,0},
 			{1,1,1,1},
 			{0,0,0,0},
 			{0,0,0,0}
 		},
-		{	//O yellow
+		{	//O red
 			{0,0,0,0},
 			{0,1,1,0},
 			{0,1,1,0},
 			{0,0,0,0}
 		},
-		{	//L orange
+		{	//L light green
 			{1,0,0},
 			{1,1,1},
 			{0,0,0}
 		},
-		{	//J blue
+		{	//J orange
 			{0,0,1},
 			{1,1,1},
 			{0,0,0}
@@ -29,7 +29,7 @@ public class tetrominoes {
 			{1,1,0},
 			{0,0,0}
 		},
-		{	//Z red
+		{	//Z blue
 			{1,1,0},
 			{0,1,1},
 			{0,0,0}
