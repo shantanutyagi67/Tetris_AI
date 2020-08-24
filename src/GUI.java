@@ -34,6 +34,8 @@ public class GUI extends JFrame{
 	int score = 0;
 	boolean prev = false, hold = true;
 	int T = 0, swap = -1;
+	Toolkit t=Toolkit.getDefaultToolkit();  
+    Image im=t.getImage("images/color_pallette3.jpeg"), tile;
 	Vector<Integer> Tminoes = new Vector<Integer>();
 	
 	public GUI() {
@@ -149,8 +151,10 @@ public class GUI extends JFrame{
 			for(int i=0;i<20;i++) {
 				for(int j=0;j<10;j++) {
 					if(endState[i][j] != -1) {
-						g2D.setColor(blockColor(endState[i][j],255));
-						g2D.fill(new Rectangle2D.Double(spacing+(j+6)*size, spacing+(i+1)*size, size-2*spacing, size-2*spacing));
+						//g2D.setColor(blockColor(endState[i][j],255));
+						//g2D.fill(new Rectangle2D.Double(spacing+(j+6)*size, spacing+(i+1)*size, size-2*spacing, size-2*spacing));
+						tile = t.getImage("tiles/"+endState[i][j]+".png");
+						g2D.drawImage(tile, (j+6)*size,(i+1)*size,this);
 					}
 				}
 			}
@@ -159,15 +163,16 @@ public class GUI extends JFrame{
 			for(int i=0;i<n;i++) {
 				for(int j=0;j<n;j++) {
 					g2D.setColor(blockColor(ran,255));
-					if(asset.peices[ran][i][j]==1 && x+j+6<16 && x+j+6>=6 && y+i+1<=20 && y+i+1>=1)
-						g2D.fill(new Rectangle2D.Double(spacing+(x+j+6)*size, spacing+(y+i+1)*size, size-2*spacing, size-2*spacing));
-					
+					if(asset.peices[ran][i][j]==1 && x+j+6<16 && x+j+6>=6 && y+i+1<=20 && y+i+1>=1) {
+						//g2D.fill(new Rectangle2D.Double(spacing+(x+j+6)*size, spacing+(y+i+1)*size, size-2*spacing, size-2*spacing));
+						tile = t.getImage("tiles/"+ran+".png");
+						g2D.drawImage(tile, (x+j+6)*size,(y+i+1)*size,this);
+					}
 				}
 			}
 			
+			
 			// color pallette
-			Toolkit t=Toolkit.getDefaultToolkit();  
-	        Image im=t.getImage("images/color_pallette3.jpeg");
 	        g2D.drawImage(im, 800,558,this);
 	        g2D.setColor(new Color(6,24,33));
 			g2D.setFont(new Font("Monospaced", Font.PLAIN, 15));
