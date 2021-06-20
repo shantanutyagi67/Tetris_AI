@@ -14,13 +14,18 @@ import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 import java.util.Vector;
 
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+
+// NOTE: add sound fx
 
 public class GUI extends JFrame{
 	private static final long serialVersionUID = 1L;
@@ -86,7 +91,7 @@ public class GUI extends JFrame{
 		public void paintComponent(Graphics g) {
 			Graphics2D g2D = (Graphics2D) g;
 			//asset.rotate(2);
-			
+			System.out.println(y);
 			//SCORE BOARD
 			g2D.setColor(new Color(6,24,33));
 			g2D.setFont(new Font("Monospaced", Font.BOLD, 40));
@@ -109,6 +114,8 @@ public class GUI extends JFrame{
 				for(int j=6;j<=15;j++) {
 					g2D.setColor(new Color(6,24,33));
 					g2D.fill(new Rectangle2D.Double(spacing+j*size, spacing+i*size, size-2*spacing, size-2*spacing));
+					//tile = t.getImage("tiles/-1.png");
+					//g2D.drawImage(tile, (j)*size,(i)*size,this);
 				}
 			}
 			
@@ -184,6 +191,7 @@ public class GUI extends JFrame{
 					for(int j=0;j<n;j++)
 						if(asset.peices[ran][i][j]==1)
 							endState[i+y-1][j+x] = ran;
+				System.out.println(holeBelow());
 				cnt=0;
 				x=3;
 				y=-n+3;
@@ -298,7 +306,13 @@ public class GUI extends JFrame{
 						asset.rotate(ran);
 						return true;
 					}
-					if((asset.peices[ran][i][j]==1 && !(x+j<10 && x+j>=0 && y+i<20 && endState[y+i][x+j]==-1)) ) {
+//					if((asset.peices[ran][i][j]==1 && !(x+j<10 && x+j>=0 && y+i<20 && endState[y+i][x+j]==-1)) ) {
+//						asset.rotate(ran);// undo the rotation
+//						asset.rotate(ran);
+//						asset.rotate(ran);
+//						return false;
+//					}
+					if((asset.peices[ran][i][j]==1 && endState[y+i][x+j]!=-1) ) {
 						asset.rotate(ran);// undo the rotation
 						asset.rotate(ran);
 						asset.rotate(ran);
@@ -375,8 +389,10 @@ public class GUI extends JFrame{
 					}
 				}
 				if(count==10) {
+					//audioPlayer.play(); 
 					s++;
 					removeRow(i);
+					//audioPlayer.pause();; 
 				}
 			}
 			if(s==4) {
@@ -390,13 +406,14 @@ public class GUI extends JFrame{
 				}
 			}
 			else if(s>0) {
-				System.out.println(s);
+				//System.out.println(s);
 				score += 100*s;
 				prev = false;
 			}
 		}
 		
 		private void removeRow(int x) {
+			//SimpleAudioPlayer audioPlayer1 = new SimpleAudioPlayer("C:\\Users\\geekSA67\\Videos\\youtube\\audios\\meme\\roblox-death-sound_1.wav");
 			for(int i=x;i>0;i--) {
 				for(int j=0;j<10;j++) {
 						endState[i][j] = endState[i-1][j];
@@ -406,6 +423,16 @@ public class GUI extends JFrame{
 				endState[0][j] = -1;
 			}
 		}
+		
+		public boolean holeBelow() {
+			for(int i=y;i<y+n;i++) {
+				for(int j=x;j<x+n;j++) {
+					if(i>=0&&j>=0&&i<19&&j<9&&endState[i][j]!=-1&&endState[i+1][j]==-1) return true;
+				}
+			}
+			return false;
+		}
+		
 		public void reset() {
 			
 		}
