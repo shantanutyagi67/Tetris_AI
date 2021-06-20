@@ -37,7 +37,7 @@ public class GUI extends JFrame{
 	int x,y, cnt = 0, tmpY;
 	int endState[][] = new int [20][10];
 	int score = 0;
-	boolean prev = false, hold = true;
+	boolean prev = false, hold = true, end = false;
 	int T = 0, swap = -1;
 	Toolkit t=Toolkit.getDefaultToolkit();  
     Image im=t.getImage("images/color_pallette3.jpeg"), tile;
@@ -91,7 +91,7 @@ public class GUI extends JFrame{
 		public void paintComponent(Graphics g) {
 			Graphics2D g2D = (Graphics2D) g;
 			//asset.rotate(2);
-			System.out.println(y);
+			//System.out.println(y);
 			//SCORE BOARD
 			g2D.setColor(new Color(6,24,33));
 			g2D.setFont(new Font("Monospaced", Font.BOLD, 40));
@@ -135,21 +135,24 @@ public class GUI extends JFrame{
 			tmpY = y;
 			while(validDownMove()) y++;
 			y--;
+//			for(int i=0;i<n;i++) {
+//				for(int j=0;j<n;j++) {
+//					g2D.setColor(new Color(255,255,255,120));
+//					if(asset.peices[ran][i][j]==1 && x+j+6<16 && x+j+6>=6 && y+i+1<=20 && y+i+1>=1)
+//						g2D.fill(new Rectangle2D.Double(spacing+(x+j+6)*size, spacing+(y+i+1)*size, size-2*spacing, size-2*spacing));
+//					
+//				}
+//			}
 			for(int i=0;i<n;i++) {
 				for(int j=0;j<n;j++) {
-					g2D.setColor(new Color(255,255,255,120));
-					if(asset.peices[ran][i][j]==1 && x+j+6<16 && x+j+6>=6 && y+i+1<=20 && y+i+1>=1)
-						g2D.fill(new Rectangle2D.Double(spacing+(x+j+6)*size, spacing+(y+i+1)*size, size-2*spacing, size-2*spacing));
-					
-				}
-			}
-			for(int i=0;i<n;i++) {
-				for(int j=0;j<n;j++) {
-					g2D.setColor(blockColor(ran,120));
 //					g2D.setColor(Color.LIGHT_GRAY);
-					if(asset.peices[ran][i][j]==1 && x+j+6<16 && x+j+6>=6 && y+i+1<=20 && y+i+1>=1)
+					if(asset.peices[ran][i][j]==1 && x+j+6<16 && x+j+6>=6 && y+i+1<=20 && y+i+1>=1) {
+						g2D.setColor(new Color(255,255,255,120));
 						g2D.fill(new Rectangle2D.Double(spacing+(x+j+6)*size, spacing+(y+i+1)*size, size-2*spacing, size-2*spacing));
-					
+						g2D.setColor(blockColor(ran,120));
+						g2D.fill(new Rectangle2D.Double(spacing+(x+j+6)*size, spacing+(y+i+1)*size, size-2*spacing, size-2*spacing));
+
+					}
 				}
 			}
 			y=tmpY;
@@ -186,15 +189,15 @@ public class GUI extends JFrame{
 			g2D.drawString("Pallette",785,850);
 			
 			checkRow();
-			if(!validDownMove()) {
+			
+			if(!validDownMove()&&!end) {
+				if(y<=0) end = true;
+				else {
 				for(int i=0;i<n;i++)
 					for(int j=0;j<n;j++)
-						if(asset.peices[ran][i][j]==1)
+						if(asset.peices[ran][i][j]==1 && i+y-1>=0)
 							endState[i+y-1][j+x] = ran;
-				System.out.println(holeBelow());
-				cnt=0;
-				x=3;
-				y=-n+3;
+				//System.out.println(holeBelow());
 				T++;
 				if(T>=7) {
 					T %= 7;
@@ -203,14 +206,20 @@ public class GUI extends JFrame{
 				ran = Tminoes.get(T%7);
 				n = ran==0||ran==1 ? 4 : 3;
 				speed = 400;
-				hold = true;
+				hold = true;   
+				cnt=0;
+				x=3;
+				y=-n+3;
+				
+				}
+				//System.out.println(end);
 			}
 			cnt++;
-			if(cnt%speed==0&& validDownMove()) {
+			if(cnt%speed==0&& validDownMove()&&!end) {
 				cnt=0;
 				y++;
 			}
-			
+			if(end) reset();
 		}
 	}
 	
@@ -325,6 +334,9 @@ public class GUI extends JFrame{
 			asset.rotate(ran);
 			return true;
 		}
+		public boolean checkEnd() {
+			return true;
+		}
 		public Color blockColor(int ran, int t) {
 			switch(ran) {
 			case 0: {
@@ -434,6 +446,22 @@ public class GUI extends JFrame{
 		}
 		
 		public void reset() {
-			
+			end = false;
+			for(int i=0;i<20;i++)
+				for(int j=0;j<10;j++)
+					endState[i][j]= -1;
+			T++;
+			ran = Tminoes.get(T%7);
+			n = ran==0||ran==1 ? 4 : 3;
+			speed = 400;
+			hold = true;   
+			cnt=0;
+			x=3;
+			y=-n+3;
+			score = 0;
+			prev = false;
+			hold = true;
+			end = false;
+			swap = -1;
 		}
 }
