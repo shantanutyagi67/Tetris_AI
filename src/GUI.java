@@ -37,7 +37,7 @@ public class GUI extends JFrame{
 	int x,y, cnt = 0, tmpY;
 	int endState[][] = new int [20][10];
 	int score = 0;
-	boolean prev = false, hold = true, end = false;
+	boolean prev = false, hold = true, end = false, reset = false;
 	int T = 0, swap = -1;
 	Toolkit t=Toolkit.getDefaultToolkit();  
     Image im=t.getImage("images/color_pallette3.jpeg"), tile;
@@ -118,6 +118,31 @@ public class GUI extends JFrame{
 					//g2D.drawImage(tile, (j)*size,(i)*size,this);
 				}
 			}
+			//check if game end
+			if(!validDownMove()&&!end) {
+				if(y<=0) end = true;
+				else {
+					for(int i=0;i<n;i++)
+						for(int j=0;j<n;j++)
+							if(asset.peices[ran][i][j]==1 && i+y-1>=0)
+								endState[i+y-1][j+x] = ran;
+					//System.out.println(holeBelow());
+					T++;
+					if(T>=7) {
+						T %= 7;
+						Collections.shuffle(Tminoes);
+					}
+					ran = Tminoes.get(T%7);
+					n = ran==0||ran==1 ? 4 : 3;
+					speed = 400;
+					hold = true;   
+					cnt=0;
+					x=3;
+					y=-n+2;
+					
+				}
+				//System.out.println(end);
+			}
 			
 			//held piece
 //			if(swap!=-1) {
@@ -143,15 +168,17 @@ public class GUI extends JFrame{
 //					
 //				}
 //			}
-			for(int i=0;i<n;i++) {
-				for(int j=0;j<n;j++) {
-//					g2D.setColor(Color.LIGHT_GRAY);
-					if(asset.peices[ran][i][j]==1 && x+j+6<16 && x+j+6>=6 && y+i+1<=20 && y+i+1>=1) {
-						g2D.setColor(new Color(255,255,255,120));
-						g2D.fill(new Rectangle2D.Double(spacing+(x+j+6)*size, spacing+(y+i+1)*size, size-2*spacing, size-2*spacing));
-						g2D.setColor(blockColor(ran,120));
-						g2D.fill(new Rectangle2D.Double(spacing+(x+j+6)*size, spacing+(y+i+1)*size, size-2*spacing, size-2*spacing));
-
+			if(!end) {
+				for(int i=0;i<n;i++) {
+					for(int j=0;j<n;j++) {
+	//					g2D.setColor(Color.LIGHT_GRAY);
+						if(asset.peices[ran][i][j]==1 && x+j+6<16 && x+j+6>=6 && y+i+1<=20 && y+i+1>=1) {
+							g2D.setColor(new Color(255,255,255,120));
+							g2D.fill(new Rectangle2D.Double(spacing+(x+j+6)*size, spacing+(y+i+1)*size, size-2*spacing, size-2*spacing));
+							g2D.setColor(blockColor(ran,120));
+							g2D.fill(new Rectangle2D.Double(spacing+(x+j+6)*size, spacing+(y+i+1)*size, size-2*spacing, size-2*spacing));
+	
+						}
 					}
 				}
 			}
@@ -190,36 +217,13 @@ public class GUI extends JFrame{
 			
 			checkRow();
 			
-			if(!validDownMove()&&!end) {
-				if(y<=0) end = true;
-				else {
-				for(int i=0;i<n;i++)
-					for(int j=0;j<n;j++)
-						if(asset.peices[ran][i][j]==1 && i+y-1>=0)
-							endState[i+y-1][j+x] = ran;
-				//System.out.println(holeBelow());
-				T++;
-				if(T>=7) {
-					T %= 7;
-					Collections.shuffle(Tminoes);
-				}
-				ran = Tminoes.get(T%7);
-				n = ran==0||ran==1 ? 4 : 3;
-				speed = 400;
-				hold = true;   
-				cnt=0;
-				x=3;
-				y=-n+3;
-				
-				}
-				//System.out.println(end);
-			}
 			cnt++;
 			if(cnt%speed==0&& validDownMove()&&!end) {
 				cnt=0;
 				y++;
 			}
-			if(end) reset();
+			if(end & reset) reset();
+			if(reset) reset();
 		}
 	}
 	
@@ -241,6 +245,9 @@ public class GUI extends JFrame{
 				}
 				if (e.getKeyCode()==KeyEvent.VK_SPACE){
 					speed=10;
+				}
+				if(e.getKeyCode()==KeyEvent.VK_R) {
+					reset = true;
 				}
 			}
 
@@ -278,7 +285,7 @@ public class GUI extends JFrame{
 						ran = Tminoes.get(T%7);
 						n = ran==0||ran==1 ? 4 : 3;
 						x = 3;
-						y = -n+3;
+						y = -n+2;
 					}
 					else if(hold){ // swap and hold
 						int temp = swap;
@@ -463,5 +470,6 @@ public class GUI extends JFrame{
 			hold = true;
 			end = false;
 			swap = -1;
+			reset = false;
 		}
 }
